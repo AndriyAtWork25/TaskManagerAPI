@@ -1,0 +1,75 @@
+/* — Весь попередній CSS залишається, додаємо нижче — */
+
+/* Таби авторизації */
+.auth-tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+
+.tab {
+  padding: 10px 25px;
+  background: #f1f4ff;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #555;
+  user-select: none;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab.active {
+  background: #000dff;
+  color: #fff;
+  border-color: #000dff;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.auth-form.hidden {
+  display: none;
+}
+
+/* Повідомлення про помилки */
+.error {
+  color: #ff3b3b;
+  margin-bottom: 20px;
+  min-height: 20px;
+  font-weight: 600;
+  text-align: center;
+  user-select: none;
+}
+
+/* Розділ задач */
+#task-section {
+  text-align: center;
+}
+
+#task-section.hidden {
+  display: none;
+}
+
+/* Кнопка вийти */
+.logout-btn {
+  margin-top: 20px;
+  background: #ff3b3b;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #ff1a1a;
+}
+

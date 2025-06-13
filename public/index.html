@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Task Manager - Авторизація</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>📝 Task Manager</h1>
+
+    <div class="auth-tabs">
+      <button id="login-tab" class="tab active">Увійти</button>
+      <button id="register-tab" class="tab">Реєстрація</button>
+    </div>
+
+    <form id="login-form" class="auth-form">
+  <input type="email" id="login-email" placeholder="Email" required />
+  <input type="password" id="login-password" placeholder="Пароль" required />
+  <button type="submit">Увійти</button>
+</form>
+
+
+   <form id="register-form" class="auth-form hidden">
+  <input type="text" id="register-username" placeholder="Ім'я користувача" required />
+  <input type="email" id="register-email" placeholder="Email" required />
+  <input type="password" id="register-password" placeholder="Пароль" required />
+  <button type="submit">Зареєструватися</button>
+   </form>
+
+
+    <div id="error-msg" class="error"></div>
+
+    <div id="task-section" class="hidden">
+      <form id="task-form">
+        <input type="text" id="task-input" placeholder="Нова задача..." required />
+        <button type="submit">Додати</button>
+      </form>
+      <ul id="task-list"></ul>
+      <button id="logout-btn" class="logout-btn">Вийти</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
+

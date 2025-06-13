@@ -1,0 +1,59 @@
+openapi: 3.0.0
+info:
+  title: Task Manager API
+  version: 1.0.0
+  description: API для керування користувачами (реєстрація/логін)
+
+servers:
+  - url: http://localhost:3000
+    description: Local server
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Реєстрація користувача
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+              properties:
+                username:
+                  type: string
+                  example: myuser
+                email:
+                  type: string
+                  format: email
+                  example: myuser@example.com
+                password:
+                  type: string
+                  format: password
+                  example: mypassword
+      responses:
+        '201':
+          description: Успішна реєстрація, повертає JWT токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT токен
+        '400':
+          description: Помилка валідації або користувач існує
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: User with this username or email already exists
