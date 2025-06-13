@@ -12,10 +12,17 @@ coverage/
 
 # Mac OS
 .DS_Store
+Thumbs.db
+
+# Jest
+coverage/
 
 # Logs
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Tasks file (якщо це тимчасовий кеш)
 tasks.json
