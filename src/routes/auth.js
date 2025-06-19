@@ -1,3 +1,4 @@
+// src/routes/auth.js
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
@@ -19,6 +20,19 @@ router.post('/register', async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
 
+    // Валідація
+    if (!username || username.trim().length < 2) {
+      return res.status(400).json({ message: 'Імʼя користувача надто коротке' });
+    }
+
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ message: 'Некоректна email адреса' });
+    }
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({ message: 'Пароль має бути щонайменше 6 символів' });
+    }
+
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ message: 'Email вже зареєстрований' });
 
@@ -36,6 +50,10 @@ router.post('/register', async (req, res, next) => {
 router.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Введіть email і пароль' });
+    }
 
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ message: 'Невірна пошта або пароль' });

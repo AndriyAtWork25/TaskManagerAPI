@@ -1,3 +1,4 @@
+// src/routes/tasks.js
 import express from 'express';
 import Task from '../models/Task.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
@@ -7,7 +8,6 @@ const router = express.Router();
 // Отримати задачі
 router.get('/', authMiddleware, async (req, res, next) => {
   try {
-    console.log('📥 GET /tasks → user:', req.user);
     const tasks = await Task.find({ user: req.user.id });
     res.json(tasks);
   } catch (err) {
@@ -20,10 +20,13 @@ router.get('/', authMiddleware, async (req, res, next) => {
 router.post('/', authMiddleware, async (req, res, next) => {
   try {
     const { title } = req.body;
-    console.log('📥 POST /tasks → title:', title, 'user:', req.user);
+
+    if (!title || title.trim().length < 3) {
+      return res.status(400).json({ message: 'Назва задачі має містити щонайменше 3 символи' });
+    }
 
     const newTask = await Task.create({
-      title,
+      title: title.trim(),
       user: req.user.id,
     });
 
