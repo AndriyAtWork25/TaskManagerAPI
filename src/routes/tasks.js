@@ -4,40 +4,51 @@ import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.use(authMiddleware);
-
-// GET /tasks - задачі поточного користувача
-router.get('/', async (req, res) => {
-  const tasks = await Task.find({ user: req.user.id });
-  res.json(tasks);
+// Отримати задачі
+router.get('/', authMiddleware, async (req, res, next) => {
+  try {
+    console.log('📥 GET /tasks → user:', req.user);
+    const tasks = await Task.find({ user: req.user.id });
+    res.json(tasks);
+  } catch (err) {
+    console.error('❌ Помилка при отриманні задач:', err);
+    next(err);
+  }
 });
 
-// POST /tasks - створення задачі
-router.post('/', async (req, res) => {
-  const { title } = req.body;
-  const task = await Task.create({
-    title,
-    user: req.user.id,
-  });
-  res.status(201).json(task);
+// Додати задачу
+router.post('/', authMiddleware, async (req, res, next) => {
+  try {
+    const { title } = req.body;
+    console.log('📥 POST /tasks → title:', title, 'user:', req.user);
+
+    const newTask = await Task.create({
+      title,
+      user: req.user.id,
+    });
+
+    res.status(201).json(newTask);
+  } catch (err) {
+    console.error('❌ Помилка при створенні задачі:', err);
+    next(err);
+  }
 });
 
-// PATCH /tasks/:id - зміна completed
-router.patch('/:id', async (req, res) => {
-  const task = await Task.findOne({ _id: req.params.id, user: req.user.id });
-  if (!task) return res.status(404).json({ message: 'Not found' });
+// Видалити задачу
+router.delete('/:id', authMiddleware, async (req, res, next) => {
+  try {
+    const task = await Task.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user.id,
+    });
 
-  task.completed = !task.completed;
-  await task.save();
-  res.json(task);
-});
+    if (!task) return res.status(404).json({ message: 'Задача не знайдена' });
 
-// DELETE /tasks/:id
-router.delete('/:id', async (req, res) => {
-  const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.id });
-  if (!task) return res.status(404).json({ message: 'Not found' });
-
-  res.status(204).send();
+    res.json({ message: 'Задача видалена' });
+  } catch (err) {
+    console.error('❌ Помилка при видаленні задачі:', err);
+    next(err);
+  }
 });
 
 export default router;

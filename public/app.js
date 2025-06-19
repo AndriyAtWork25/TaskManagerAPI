@@ -61,7 +61,6 @@ registerForm.addEventListener('submit', async e => {
   }
 });
 
-
 // Логін користувача
 loginForm.addEventListener('submit', async e => {
   e.preventDefault();
@@ -88,8 +87,7 @@ loginForm.addEventListener('submit', async e => {
   }
 });
 
-
-// Показуємо інтерфейс задач
+// Показати секцію задач
 function showApp() {
   errorMsg.textContent = '';
   loginForm.classList.add('hidden');
@@ -99,7 +97,7 @@ function showApp() {
   fetchTasks();
 }
 
-// Вийти
+// Вийти з акаунту
 logoutBtn.addEventListener('click', () => {
   token = null;
   taskList.innerHTML = '';
@@ -111,19 +109,27 @@ logoutBtn.addEventListener('click', () => {
   errorMsg.textContent = '';
 });
 
-// Отримання задач
+// 🔍 Завантажити задачі
 async function fetchTasks() {
   try {
     const res = await fetch('/tasks', {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (!res.ok) throw new Error('Не вдалося завантажити задачі');
+    console.log('fetchTasks → статус:', res.status);
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('fetchTasks → помилка:', errorText);
+      throw new Error('Не вдалося завантажити задачі');
+    }
 
     const tasks = await res.json();
+    console.log('fetchTasks → задачі:', tasks);
     renderTasks(tasks);
   } catch (err) {
     showError(err.message);
+    console.error('fetchTasks → виняток:', err);
   }
 }
 
