@@ -1,68 +1,71 @@
 // src/routes/auth.js
 import express from 'express';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { ApiError } from '../utils/ApiError.js';
+import { ApiResponse } from '../utils/ApiResponse.js';
 
 const router = express.Router();
 
-// Створення JWT токена
-function createToken(user) {
-  return jwt.sign(
-    { id: user._id, username: user.username },
-    process.env.JWT_SECRET,
-    { expiresIn: '1d' }
-  );
-}
-
-// Реєстрація
+/**
+ * Реєстрація нового користувача
+ * POST /auth/register
+ * body: { email, password }
+ */
 router.post('/register', async (req, res, next) => {
   try {
-    const { username, email, password } = req.body;
+    const { email, password } = req.body;
 
-    // Валідація
-    if (!username || username.trim().length < 2) {
-      return res.status(400).json({ message: 'Імʼя користувача надто коротке' });
+    if (!email || !password) {
+      return next(new ApiError(400, 'Email and password are required'));
     }
 
-    if (!email || !email.includes('@')) {
-      return res.status(400).json({ message: 'Некоректна email адреса' });
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return next(new ApiError(400, 'User already exists'));
     }
-
-    if (!password || password.length < 6) {
-      return res.status(400).json({ message: 'Пароль має бути щонайменше 6 символів' });
-    }
-
-    const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ message: 'Email вже зареєстрований' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ username, email, password: hashedPassword });
 
-    const token = createToken(user);
-    res.json({ token });
+    const user = await User.create({ email, password: hashedPassword });
+
+    res.status(201).json(
+      new ApiResponse(true, 'User registered successfully', { id: user._id, email: user.email })
+    );
   } catch (err) {
     next(err);
   }
 });
 
-// Логін
+/**
+ * Логін користувача
+ * POST /auth/login
+ * body: { email, password }
+ */
 router.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: 'Введіть email і пароль' });
+      return next(new ApiError(400, 'Email and password are required'));
     }
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: 'Невірна пошта або пароль' });
+    if (!user) {
+      return next(new ApiError(401, 'Invalid credentials'));
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: 'Невірна пошта або пароль' });
+    if (!isMatch) {
+      return next(new ApiError(401, 'Invalid credentials'));
+    }
 
-    const token = createToken(user);
-    res.json({ token });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.status(200).json(
+      new ApiResponse(true, 'Login successful', { token, user: { id: user._id, email: user.email } })
+    );
   } catch (err) {
     next(err);
   }
