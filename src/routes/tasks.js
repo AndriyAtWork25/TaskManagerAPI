@@ -2,95 +2,69 @@
 import express from 'express';
 import Task from '../models/Task.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
-import { ApiError } from '../utils/ApiError.js'; // наш клас помилок
+import { ApiError } from '../utils/ApiError.js';
+import { ApiResponse } from '../utils/ApiResponse.js';
 
 const router = express.Router();
 
-/**
- * Отримати всі задачі користувача
- * GET /tasks
- */
+// Отримати всі задачі користувача
 router.get('/', authMiddleware, async (req, res, next) => {
   try {
-    const tasks = await Task.find({ user: req.user.id }).sort({ createdAt: -1 });
-    res.status(200).json({
-      success: true,
-      data: tasks,
-      message: 'Tasks retrieved successfully',
-    });
+    const tasks = await Task.find({ user: req.user.id });
+    res.json(new ApiResponse(true, 'Tasks fetched successfully', tasks));
   } catch (err) {
     next(err);
   }
 });
 
-/**
- * Додати задачу
- * POST /tasks
- */
+// Додати нову задачу
 router.post('/', authMiddleware, async (req, res, next) => {
   try {
     const { title } = req.body;
-
     if (!title || title.trim().length < 3) {
-      return next(new ApiError(400, 'Назва задачі має містити щонайменше 3 символи'));
+      return next(new ApiError(400, 'Task title must be at least 3 characters'));
     }
 
     const newTask = await Task.create({
       title: title.trim(),
       user: req.user.id,
-      completed: false,
     });
 
-    res.status(201).json({
-      success: true,
-      data: newTask,
-      message: 'Task created successfully',
-    });
+    res.status(201).json(new ApiResponse(true, 'Task created', newTask));
   } catch (err) {
     next(err);
   }
 });
 
-/**
- * Оновити статус задачі (completed / not completed)
- * PATCH /tasks/:id/toggle
- */
-router.patch('/:id/toggle', authMiddleware, async (req, res, next) => {
+// Оновити статус задачі
+router.patch('/:id', authMiddleware, async (req, res, next) => {
   try {
-    const task = await Task.findOne({ _id: req.params.id, user: req.user.id });
-    if (!task) {
-      return next(new ApiError(404, 'Задача не знайдена'));
+    const { completed } = req.body;
+    if (typeof completed !== 'boolean') {
+      return next(new ApiError(400, 'Completed must be boolean'));
     }
 
-    task.completed = !task.completed;
-    await task.save();
+    const task = await Task.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.id },
+      { completed },
+      { new: true }
+    );
 
-    res.status(200).json({
-      success: true,
-      data: task,
-      message: 'Task status updated successfully',
-    });
+    if (!task) return next(new ApiError(404, 'Task not found'));
+
+    res.json(new ApiResponse(true, 'Task updated', task));
   } catch (err) {
     next(err);
   }
 });
 
-/**
- * Видалити задачу
- * DELETE /tasks/:id
- */
+// Видалити задачу
 router.delete('/:id', authMiddleware, async (req, res, next) => {
   try {
     const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.id });
-    if (!task) {
-      return next(new ApiError(404, 'Задача не знайдена'));
-    }
+    if (!task) return next(new ApiError(404, 'Task not found'));
 
-    res.status(200).json({
-      success: true,
-      data: task,
-      message: 'Task deleted successfully',
-    });
+    res.json(new ApiResponse(true, 'Task deleted'));
   } catch (err) {
     next(err);
   }
