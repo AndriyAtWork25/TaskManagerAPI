@@ -1,23 +1,41 @@
+// src/middleware/authMiddleware.js
 import jwt from 'jsonwebtoken';
+import { ApiError } from '../utils/ApiError.js';
 
+/**
+ * Перевіряє Bearer-токен у заголовку Authorization
+ * і додає req.user = { id: <userId> } при валідному токені.
+ */
 export function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader?.startsWith('Bearer ')) {
-    console.warn('⛔️ Відсутній Authorization Header');
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
-
-  const token = authHeader.split(' ')[1];
-
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // ⬅️ отримаємо { id, username }
-    console.log('🔐 Authenticated user:', req.user);
-    next();
+    const auth = req.headers.authorization;
+
+    if (!auth) {
+      return next(new ApiError(401, 'Authorization header missing'));
+    }
+
+    const [scheme, token] = auth.split(' ');
+    if (scheme !== 'Bearer' || !token) {
+      return next(
+        new ApiError(401, 'Invalid Authorization header format. Expected: Bearer <token>')
+      );
+    }
+
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Підлаштовуємося під можливі назви поля в токені
+    const userId = payload.id || payload._id || payload.sub;
+    if (!userId) {
+      return next(new ApiError(401, 'Invalid token payload'));
+    }
+
+    req.user = { id: userId };
+    return next();
   } catch (err) {
-    console.error('❌ Invalid token:', err);
-    return res.status(401).json({ message: 'Invalid token' });
+    if (err.name === 'TokenExpiredError') {
+      return next(new ApiError(401, 'Token expired'));
+    }
+    return next(new ApiError(401, 'Invalid or expired token'));
   }
 }
 
