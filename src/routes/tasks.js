@@ -10,7 +10,7 @@ const router = express.Router();
 // Отримати всі задачі користувача
 router.get('/', authMiddleware, async (req, res, next) => {
   try {
-    const tasks = await Task.find({ user: req.user.id });
+    const tasks = await Task.find({ user: req.user.id }).sort({ createdAt: -1 });
     res.json(new ApiResponse(true, 'Tasks fetched successfully', tasks));
   } catch (err) {
     next(err);
@@ -64,7 +64,7 @@ router.delete('/:id', authMiddleware, async (req, res, next) => {
     const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.id });
     if (!task) return next(new ApiError(404, 'Task not found'));
 
-    res.json(new ApiResponse(true, 'Task deleted'));
+    res.json(new ApiResponse(true, 'Task deleted', null));
   } catch (err) {
     next(err);
   }

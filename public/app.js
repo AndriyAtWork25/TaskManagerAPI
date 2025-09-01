@@ -1,4 +1,5 @@
-// 🌌 Розширений та анімований футуристичний фронтенд для Task Manager
+// 🌌 Фронтенд Task Manager з BASE_URL
+const BASE_URL = 'http://localhost:3000';
 
 const loginTab = document.getElementById('login-tab');
 const registerTab = document.getElementById('register-tab');
@@ -11,9 +12,10 @@ const taskInput = document.getElementById('task-input');
 const taskList = document.getElementById('task-list');
 const logoutBtn = document.getElementById('logout-btn');
 
-let token = null;
+// 🔹 Токен з localStorage
+let token = localStorage.getItem('taskToken') || null;
 
-// 🔄 Переключення табів з анімацією
+// 🔄 Переключення табів
 loginTab.addEventListener('click', () => switchTab('login'));
 registerTab.addEventListener('click', () => switchTab('register'));
 
@@ -31,45 +33,62 @@ function showError(message) {
   setTimeout(() => errorMsg.classList.remove('shake'), 500);
 }
 
-// 🆕 Реєстрація користувача
+// 🔹 Якщо токен вже є, показуємо додаток
+if (token) {
+  showApp();
+}
+
+// 🆕 Реєстрація
 registerForm.addEventListener('submit', async e => {
   e.preventDefault();
   const username = document.getElementById('register-username').value.trim();
   const email = document.getElementById('register-email').value.trim();
   const password = document.getElementById('register-password').value.trim();
+
   try {
-    const res = await fetch('/auth/register', {
+    const res = await fetch(`${BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, email, password }),
     });
-    if (!res.ok) throw new Error((await res.json()).message || 'Помилка реєстрації');
-    token = (await res.json()).token;
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Помилка реєстрації');
+
+    // ⚡ Токен тепер у data.data.token
+    token = data.data.token;
+    localStorage.setItem('taskToken', token);
     showApp();
   } catch (err) {
     showError(err.message);
   }
 });
 
-// 🔑 Логін користувача
+// 🔑 Логін
 loginForm.addEventListener('submit', async e => {
   e.preventDefault();
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value.trim();
+
   try {
-    const res = await fetch('/auth/login', {
+    const res = await fetch(`${BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
-    if (!res.ok) throw new Error((await res.json()).message || 'Помилка входу');
-    token = (await res.json()).token;
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Помилка входу');
+
+    token = data.data.token;
+    localStorage.setItem('taskToken', token);
     showApp();
   } catch (err) {
     showError(err.message);
   }
 });
 
+// 🔹 Показати додаток
 function showApp() {
   errorMsg.textContent = '';
   loginForm.classList.add('hidden');
@@ -79,8 +98,10 @@ function showApp() {
   fetchTasks();
 }
 
+// 🔹 Вихід
 logoutBtn.addEventListener('click', () => {
   token = null;
+  localStorage.removeItem('taskToken');
   taskList.innerHTML = '';
   taskSection.classList.add('hidden');
   document.querySelector('.auth-tabs').classList.remove('hidden');
@@ -90,37 +111,51 @@ logoutBtn.addEventListener('click', () => {
   errorMsg.textContent = '';
 });
 
-// ⬇️ Отримання задач
+// ⬇ Отримання задач
 async function fetchTasks() {
+  if (!token) return;
+
   try {
-    const res = await fetch('/tasks', {
+    const res = await fetch(`${BASE_URL}/tasks`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!res.ok) throw new Error('Не вдалося завантажити задачі');
-    const tasks = await res.json();
-    renderTasks(tasks);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Не вдалося завантажити задачі');
+    renderTasks(data.data || []);
   } catch (err) {
     showError(err.message);
   }
 }
 
+// 🔧 Рендер задач
 function renderTasks(tasks) {
   taskList.innerHTML = '';
   if (tasks.length === 0) {
     taskList.innerHTML = '<li class="no-task">Задач немає</li>';
     return;
   }
+
   tasks.forEach(task => {
     const li = document.createElement('li');
-    li.innerHTML = `<span>${task.title}</span>`;
+    li.classList.add('task-item');
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = task.completed;
+    checkbox.addEventListener('change', () => updateTask(task._id, checkbox.checked));
+
+    const span = document.createElement('span');
+    span.textContent = task.title;
+    span.style.textDecoration = task.completed ? 'line-through' : 'none';
 
     const delBtn = document.createElement('button');
     delBtn.textContent = '✖';
     delBtn.className = 'del-btn';
     delBtn.addEventListener('click', () => deleteTask(task._id));
 
+    li.appendChild(checkbox);
+    li.appendChild(span);
     li.appendChild(delBtn);
-    li.classList.add('task-item');
     taskList.appendChild(li);
   });
 }
@@ -130,8 +165,9 @@ taskForm.addEventListener('submit', async e => {
   e.preventDefault();
   const title = taskInput.value.trim();
   if (!title) return;
+
   try {
-    const res = await fetch('/tasks', {
+    const res = await fetch(`${BASE_URL}/tasks`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -139,7 +175,10 @@ taskForm.addEventListener('submit', async e => {
       },
       body: JSON.stringify({ title }),
     });
-    if (!res.ok) throw new Error('Не вдалося додати задачу');
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Не вдалося додати задачу');
+
     taskInput.value = '';
     fetchTasks();
   } catch (err) {
@@ -150,18 +189,40 @@ taskForm.addEventListener('submit', async e => {
 // ❌ Видалення задачі
 async function deleteTask(id) {
   try {
-    const res = await fetch(`/tasks/${id}`, {
+    const res = await fetch(`${BASE_URL}/tasks/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!res.ok) throw new Error('Не вдалося видалити задачу');
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Не вдалося видалити задачу');
     fetchTasks();
   } catch (err) {
     showError(err.message);
   }
 }
 
-// 🔔 Easter Egg (космічна тема)
+// 🔄 Оновлення статусу задачі
+async function updateTask(id, completed) {
+  try {
+    const res = await fetch(`${BASE_URL}/tasks/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ completed }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Не вдалося оновити задачу');
+    fetchTasks();
+  } catch (err) {
+    showError(err.message);
+  }
+}
+
+// 🔔 Easter Egg
 document.addEventListener('keydown', e => {
   if (e.key === 'z' && e.ctrlKey) {
     document.body.classList.toggle('space-mode');

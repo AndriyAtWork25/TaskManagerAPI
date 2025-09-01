@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 
 import { connectDB } from './src/db.js';
 import authRouter from './src/routes/auth.js';
-import tasksRouter from './src/routes/tasks.js'; // ✅ додано
+import tasksRouter from './src/routes/tasks.js'; 
 import { errorHandler } from './src/middleware/errorHandler.js';
 
 dotenv.config();
@@ -32,7 +32,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Маршрути
 app.use('/auth', authRouter);
-app.use('/tasks', tasksRouter); // ✅ тепер /tasks працює
+app.use('/tasks', tasksRouter);
 
 // Обробка помилок
 app.use(errorHandler);

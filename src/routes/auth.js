@@ -11,14 +11,14 @@ const router = express.Router();
 /**
  * Реєстрація нового користувача
  * POST /auth/register
- * body: { email, password }
+ * body: { username, email, password }
  */
 router.post('/register', async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { username, email, password } = req.body;
 
-    if (!email || !password) {
-      return next(new ApiError(400, 'Email and password are required'));
+    if (!username || !email || !password) {
+      return next(new ApiError(400, 'Username, email and password are required'));
     }
 
     const existingUser = await User.findOne({ email });
@@ -28,10 +28,16 @@ router.post('/register', async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ email, password: hashedPassword });
+    const user = await User.create({ username, email, password: hashedPassword });
+
+    // Генеруємо токен
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.status(201).json(
-      new ApiResponse(true, 'User registered successfully', { id: user._id, email: user.email })
+      new ApiResponse(true, 'User registered successfully', {
+        token,
+        user: { id: user._id, username: user.username, email: user.email }
+      })
     );
   } catch (err) {
     next(err);
@@ -61,10 +67,14 @@ router.post('/login', async (req, res, next) => {
       return next(new ApiError(401, 'Invalid credentials'));
     }
 
+    // Генеруємо токен
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.status(200).json(
-      new ApiResponse(true, 'Login successful', { token, user: { id: user._id, email: user.email } })
+      new ApiResponse(true, 'Login successful', {
+        token,
+        user: { id: user._id, username: user.username, email: user.email }
+      })
     );
   } catch (err) {
     next(err);
