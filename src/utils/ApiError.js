@@ -1,11 +1,11 @@
 // utils/ApiError.js
 
 /**
- * Клас для створення однакового формату помилок у всьому проєкті.
- * Ми передаємо:
- * - statusCode (HTTP код)
- * - message (текст помилки)
- * - errors (масив додаткових повідомлень або деталей)
+ *class ApiError - custom error class for API errors
+ * @extends Error
+ * @param {number} statusCode - HTTP status code
+ * @param {string} message - Error message
+ * @param {Array} errors - Optional array of detailed error messages
  */
 export class ApiError extends Error {
   constructor(statusCode, message, errors = []) {

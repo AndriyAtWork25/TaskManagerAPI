@@ -7,7 +7,7 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 
 const router = express.Router();
 
-// Отримати всі задачі користувача
+// Get all user tasks
 router.get('/', authMiddleware, async (req, res, next) => {
   try {
     const tasks = await Task.find({ user: req.user.id }).sort({ createdAt: -1 });
@@ -17,7 +17,7 @@ router.get('/', authMiddleware, async (req, res, next) => {
   }
 });
 
-// Додати нову задачу
+// add new task
 router.post('/', authMiddleware, async (req, res, next) => {
   try {
     const { title } = req.body;
@@ -36,7 +36,7 @@ router.post('/', authMiddleware, async (req, res, next) => {
   }
 });
 
-// Оновити статус задачі
+// update task status
 router.patch('/:id', authMiddleware, async (req, res, next) => {
   try {
     const { completed } = req.body;
@@ -58,7 +58,7 @@ router.patch('/:id', authMiddleware, async (req, res, next) => {
   }
 });
 
-// Видалити задачу
+// delete task
 router.delete('/:id', authMiddleware, async (req, res, next) => {
   try {
     const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.id });

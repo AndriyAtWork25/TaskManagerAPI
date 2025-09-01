@@ -3,8 +3,8 @@ import jwt from 'jsonwebtoken';
 import { ApiError } from '../utils/ApiError.js';
 
 /**
- * Перевіряє Bearer-токен у заголовку Authorization
- * і додає req.user = { id: <userId> } при валідному токені.
+ * Checks Bearer-token in description Authorization
+ * and adds req.user = { id: <userId> } at valid token.
  */
 export function authMiddleware(req, res, next) {
   try {
@@ -23,7 +23,7 @@ export function authMiddleware(req, res, next) {
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Підлаштовуємося під можливі назви поля в токені
+    // We are adjusting to possible field names in the token.
     const userId = payload.id || payload._id || payload.sub;
     if (!userId) {
       return next(new ApiError(401, 'Invalid token payload'));

@@ -1,12 +1,12 @@
 // src/utils/ApiResponse.js
 
 /**
- * Клас для стандартизації відповідей від API.
- * Завжди повертаємо однакову структуру:
+ * class for standard API responses.
+ * lways returns the same structure:
  * - success (true/false)
- * - message (текст повідомлення)
- * - data (результат, якщо є)
- * - errors (масив деталей помилок, якщо є)
+ * - message (text message)
+ * - data (results, if any)
+ * - errors (object with detailed errors, if any)
  */
 export class ApiResponse {
   constructor(success, message, data = null, errors = []) {

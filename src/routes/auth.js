@@ -9,7 +9,7 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 const router = express.Router();
 
 /**
- * Реєстрація нового користувача
+ * Registrate new user
  * POST /auth/register
  * body: { username, email, password }
  */
@@ -30,7 +30,7 @@ router.post('/register', async (req, res, next) => {
 
     const user = await User.create({ username, email, password: hashedPassword });
 
-    // Генеруємо токен
+    // Generate token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.status(201).json(
@@ -45,7 +45,7 @@ router.post('/register', async (req, res, next) => {
 });
 
 /**
- * Логін користувача
+ * Login user
  * POST /auth/login
  * body: { email, password }
  */
@@ -67,7 +67,7 @@ router.post('/login', async (req, res, next) => {
       return next(new ApiError(401, 'Invalid credentials'));
     }
 
-    // Генеруємо токен
+    // Generate token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.status(200).json(

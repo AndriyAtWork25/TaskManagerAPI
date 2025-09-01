@@ -1,4 +1,4 @@
-/* 🌌 Загальний стиль */
+/* 🌌 Main Style */
 body {
   margin: 0;
   padding: 0;
@@ -12,7 +12,7 @@ body {
   transition: background 1s ease;
 }
 
-/* 🌠 Космічна тема */
+/* 🌠 Cosmic theme */
 body.space-mode {
   background: radial-gradient(circle at center, #050505, #0b0b0b);
   animation: stars 20s linear infinite;
@@ -23,7 +23,7 @@ body.space-mode {
   to { background-position: 1000px 1000px; }
 }
 
-/* 🧊 Скляний контейнер */
+/* 🧊 glass container */
 .glass-container {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 20px;
@@ -44,7 +44,7 @@ h1 {
   text-shadow: 0 0 10px #00ffe7;
 }
 
-/* Таби */
+/* tabs */
 .auth-tabs {
   display: flex;
   justify-content: center;
@@ -114,7 +114,7 @@ button:hover {
   box-shadow: 0 0 15px #00e0ff;
 }
 
-/* Помилка */
+/* error */
 .error {
   color: #ff4d4d;
   min-height: 20px;
@@ -204,7 +204,7 @@ button:hover {
   box-shadow: 0 0 15px #ff1a1a;
 }
 
-/* Анімація появи */
+/* Keyframes */
 @keyframes fadeIn {
   from {
     opacity: 0;

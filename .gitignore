@@ -24,5 +24,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Tasks file (якщо це тимчасовий кеш)
+# Tasks file (if its tempotary or build generated)
 tasks.json

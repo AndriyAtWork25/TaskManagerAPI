@@ -2,7 +2,7 @@
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 
-// Централізований обробник помилок
+// Centralized error processor
 export function errorHandler(err, req, res, next) {
   console.error('Error:', err);
 
@@ -12,7 +12,7 @@ export function errorHandler(err, req, res, next) {
       .json(new ApiResponse(false, err.message, null, err.errors));
   }
 
-  // Якщо помилка інша (не ApiError)
+  // If the error is different (not ApiError)
   return res
     .status(500)
     .json(new ApiResponse(false, 'Internal Server Error', null, [err.message]));

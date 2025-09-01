@@ -1,4 +1,4 @@
-// 🌌 Фронтенд Task Manager з BASE_URL
+// 🌌 Front End Task Manager with BASE_URL
 const BASE_URL = 'http://localhost:3000';
 
 const loginTab = document.getElementById('login-tab');
@@ -12,10 +12,10 @@ const taskInput = document.getElementById('task-input');
 const taskList = document.getElementById('task-list');
 const logoutBtn = document.getElementById('logout-btn');
 
-// 🔹 Токен з localStorage
+// 🔹 Token out of localStorage
 let token = localStorage.getItem('taskToken') || null;
 
-// 🔄 Переключення табів
+// 🔄 Changing tabs
 loginTab.addEventListener('click', () => switchTab('login'));
 registerTab.addEventListener('click', () => switchTab('register'));
 
@@ -33,12 +33,12 @@ function showError(message) {
   setTimeout(() => errorMsg.classList.remove('shake'), 500);
 }
 
-// 🔹 Якщо токен вже є, показуємо додаток
+// 🔹 If token is there, show the app
 if (token) {
   showApp();
 }
 
-// 🆕 Реєстрація
+// 🆕 Registration
 registerForm.addEventListener('submit', async e => {
   e.preventDefault();
   const username = document.getElementById('register-username').value.trim();
@@ -55,7 +55,7 @@ registerForm.addEventListener('submit', async e => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Помилка реєстрації');
 
-    // ⚡ Токен тепер у data.data.token
+    // ⚡ Token now in data.data.token
     token = data.data.token;
     localStorage.setItem('taskToken', token);
     showApp();
@@ -64,7 +64,7 @@ registerForm.addEventListener('submit', async e => {
   }
 });
 
-// 🔑 Логін
+// 🔑 Login
 loginForm.addEventListener('submit', async e => {
   e.preventDefault();
   const email = document.getElementById('login-email').value.trim();
@@ -88,7 +88,7 @@ loginForm.addEventListener('submit', async e => {
   }
 });
 
-// 🔹 Показати додаток
+// 🔹 Show App
 function showApp() {
   errorMsg.textContent = '';
   loginForm.classList.add('hidden');
@@ -98,7 +98,7 @@ function showApp() {
   fetchTasks();
 }
 
-// 🔹 Вихід
+// 🔹 Logout
 logoutBtn.addEventListener('click', () => {
   token = null;
   localStorage.removeItem('taskToken');
@@ -111,7 +111,7 @@ logoutBtn.addEventListener('click', () => {
   errorMsg.textContent = '';
 });
 
-// ⬇ Отримання задач
+// ⬇ Get Tasks
 async function fetchTasks() {
   if (!token) return;
 
@@ -127,7 +127,7 @@ async function fetchTasks() {
   }
 }
 
-// 🔧 Рендер задач
+// 🔧 Render Tasks
 function renderTasks(tasks) {
   taskList.innerHTML = '';
   if (tasks.length === 0) {
@@ -160,7 +160,7 @@ function renderTasks(tasks) {
   });
 }
 
-// ➕ Додавання задачі
+// ➕ Add tasks
 taskForm.addEventListener('submit', async e => {
   e.preventDefault();
   const title = taskInput.value.trim();
@@ -186,7 +186,7 @@ taskForm.addEventListener('submit', async e => {
   }
 });
 
-// ❌ Видалення задачі
+// ❌ Delete task
 async function deleteTask(id) {
   try {
     const res = await fetch(`${BASE_URL}/tasks/${id}`, {
@@ -202,7 +202,7 @@ async function deleteTask(id) {
   }
 }
 
-// 🔄 Оновлення статусу задачі
+// 🔄 Get status task
 async function updateTask(id, completed) {
   try {
     const res = await fetch(`${BASE_URL}/tasks/${id}`, {

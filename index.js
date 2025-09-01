@@ -15,13 +15,13 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Підключення до MongoDB
+// connect to MongoDB
 connectDB();
 
 // Middleware
 app.use(express.json());
 
-// Публічна папка
+// public folder
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
@@ -30,14 +30,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 const swaggerDocument = YAML.load('./swagger.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Маршрути
+// Routes
 app.use('/auth', authRouter);
 app.use('/tasks', tasksRouter);
 
-// Обробка помилок
+// Error handling middleware (should be last in the chain)
 app.use(errorHandler);
 
-// Запуск сервера
+// Start server
 app.listen(port, () => {
   console.log(`✅ Server is running on http://localhost:${port}`);
   console.log(`📚 Swagger docs: http://localhost:${port}/api-docs`);

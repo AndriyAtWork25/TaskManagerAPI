@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 
 export const register = async (username, email, password) => {
-  // Перевіряємо, чи є користувач з таким username або email
+  // checking if user exists
   const existingUser = await User.findOne({
     $or: [{ username }, { email }]
   });

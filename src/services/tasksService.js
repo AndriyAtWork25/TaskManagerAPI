@@ -2,7 +2,7 @@ import fs from 'fs';
 
 const TASKS_FILE = './tasks.json';
 
-// Зчитати всі задачі з файлу
+// read tasks from file
 export function loadTasks() {
   try {
     const data = fs.readFileSync(TASKS_FILE, 'utf8');
@@ -12,18 +12,18 @@ export function loadTasks() {
   }
 }
 
-// Записати задачі у файл
+// save tasks to file
 export function saveTasks(tasks) {
   fs.writeFileSync(TASKS_FILE, JSON.stringify(tasks, null, 2));
 }
 
-// Знайти задачу за id
+// find task by id
 export function findTaskById(id) {
   const tasks = loadTasks();
   return tasks.find(t => t.id === id);
 }
 
-// Оновити задачу по id
+// update task by id
 export function updateTask(id, updates) {
   const tasks = loadTasks();
   const taskIndex = tasks.findIndex(t => t.id === id);
@@ -35,7 +35,7 @@ export function updateTask(id, updates) {
   return tasks[taskIndex];
 }
 
-// Видалити задачу по id
+// delete task by id
 export function deleteTask(id) {
   const tasks = loadTasks();
   const index = tasks.findIndex(t => t.id === id);
