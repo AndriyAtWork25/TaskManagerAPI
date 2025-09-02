@@ -12,20 +12,20 @@
     <h1>📝 Task Manager</h1>
 
     <div class="auth-tabs">
-      <button id="login-tab" class="tab active">Увійти</button>
-      <button id="register-tab" class="tab">Реєстрація</button>
+      <button id="login-tab" class="tab active">Login</button>
+      <button id="register-tab" class="tab">Register</button>
     </div>
 
     <form id="login-form" class="auth-form">
       <input type="email" id="login-email" placeholder="Email" required />
-      <input type="password" id="login-password" placeholder="Пароль" required />
-      <button type="submit">Увійти</button>
+      <input type="password" id="login-password" placeholder="password" required />
+      <button type="submit">Login</button>
     </form>
 
     <form id="register-form" class="auth-form hidden">
-      <input type="text" id="register-username" placeholder="Ім'я користувача" required />
+      <input type="text" id="register-username" placeholder="User name" required />
       <input type="email" id="register-email" placeholder="Email" required />
-      <input type="password" id="register-password" placeholder="Пароль" required />
+      <input type="password" id="register-password" placeholder="password" required />
       <button type="submit">Зареєструватися</button>
     </form>
 
@@ -33,15 +33,15 @@
 
     <div id="task-section" class="hidden">
       <form id="task-form">
-        <input type="text" id="task-input" placeholder="Нова задача..." required />
-        <button type="submit">Додати</button>
+        <input type="text" id="task-input" placeholder="New task..." required />
+        <button type="submit">add</button>
       </form>
       <ul id="task-list"></ul>
-      <button id="logout-btn" class="logout-btn">Вийти</button>
+      <button id="logout-btn" class="logout-btn">Logout</button>
     </div>
   </div>
 
-  <!-- Підключаємо тільки app.js -->
+  <!-- Connect only app.js -->
   <script src="app.js"></script>
 </body>
 </html>
