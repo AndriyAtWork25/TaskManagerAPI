@@ -53,7 +53,7 @@ registerForm.addEventListener('submit', async e => {
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Помилка реєстрації');
+    if (!res.ok) throw new Error(data.message || 'Registration error');
 
     // ⚡ Token now in data.data.token
     token = data.data.token;
@@ -78,7 +78,7 @@ loginForm.addEventListener('submit', async e => {
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Помилка входу');
+    if (!res.ok) throw new Error(data.message || 'Login error');
 
     token = data.data.token;
     localStorage.setItem('taskToken', token);
@@ -120,7 +120,7 @@ async function fetchTasks() {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Не вдалося завантажити задачі');
+    if (!res.ok) throw new Error(data.message || 'Unaible to fetch tasks');
     renderTasks(data.data || []);
   } catch (err) {
     showError(err.message);
@@ -131,7 +131,7 @@ async function fetchTasks() {
 function renderTasks(tasks) {
   taskList.innerHTML = '';
   if (tasks.length === 0) {
-    taskList.innerHTML = '<li class="no-task">Задач немає</li>';
+    taskList.innerHTML = '<li class="no-task">No tasks</li>';
     return;
   }
 
@@ -177,7 +177,7 @@ taskForm.addEventListener('submit', async e => {
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Не вдалося додати задачу');
+    if (!res.ok) throw new Error(data.message || 'Unable to add task');
 
     taskInput.value = '';
     fetchTasks();
@@ -195,7 +195,7 @@ async function deleteTask(id) {
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Не вдалося видалити задачу');
+    if (!res.ok) throw new Error(data.message || 'Unable to delete task');
     fetchTasks();
   } catch (err) {
     showError(err.message);
@@ -215,7 +215,7 @@ async function updateTask(id, completed) {
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Не вдалося оновити задачу');
+    if (!res.ok) throw new Error(data.message || 'Unable to update task');
     fetchTasks();
   } catch (err) {
     showError(err.message);
