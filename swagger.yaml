@@ -2,58 +2,174 @@ openapi: 3.0.0
 info:
   title: Task Manager API
   version: 1.0.0
-  description: API для керування користувачами (реєстрація/логін)
-
+  description: |
+    Secure and scalable **Task Manager API** built with Node.js, Express, and MongoDB.  
+    Includes JWT authentication, input validation, and CRUD operations for tasks.
 servers:
   - url: http://localhost:3000
-    description: Local server
+tags:
+  - name: Auth
+    description: User registration and authentication
+  - name: Tasks
+    description: Manage user tasks
 
 paths:
   /auth/register:
     post:
-      tags:
-        - Auth
-      summary: Реєстрація користувача
+      tags: [Auth]
+      summary: Register a new user
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required:
-                - username
-                - email
-                - password
               properties:
-                username:
-                  type: string
-                  example: myuser
                 email:
                   type: string
-                  format: email
-                  example: myuser@example.com
+                  example: user@example.com
                 password:
                   type: string
-                  format: password
                   example: mypassword
       responses:
-        '201':
-          description: Успішна реєстрація, повертає JWT токен
+        201:
+          description: User registered successfully
+        400:
+          description: Validation error
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login user and get JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Login successful
+        401:
+          description: Invalid credentials
+
+  /tasks:
+    get:
+      tags: [Tasks]
+      summary: Get all tasks for the authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of tasks
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    description: JWT токен
-        '400':
-          description: Помилка валідації або користувач існує
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: User with this username or email already exists
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+    post:
+      tags: [Tasks]
+      summary: Create a new task
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInput'
+      responses:
+        201:
+          description: Task created successfully
+
+  /tasks/{id}:
+    get:
+      tags: [Tasks]
+      summary: Get a task by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Task details
+    put:
+      tags: [Tasks]
+      summary: Update task by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInput'
+      responses:
+        200:
+          description: Task updated successfully
+    delete:
+      tags: [Tasks]
+      summary: Delete task by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Task deleted successfully
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Task:
+      type: object
+      properties:
+        _id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        completed:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    TaskInput:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Buy groceries
+        description:
+          type: string
+          example: Buy eggs, milk, and bread
+        completed:
+          type: boolean
+          example: false
+      required: [title]
