@@ -4,6 +4,13 @@ A full-stack **Task Manager** application built with **Node.js, Express, and Mon
 
 ---
 
+## 🚀 Live Demo
+
+- 🌐 **Frontend / API:** [taskmanagerapi-1-jmb2.onrender.com](https://taskmanagerapi-1-jmb2.onrender.com)  
+- 📘 **Swagger Docs:** [taskmanagerapi-1-jmb2.onrender.com/api-docs](https://taskmanagerapi-1-jmb2.onrender.com/api-docs)
+
+---
+
 ## 🚀 Features
 
 - **User Authentication**
